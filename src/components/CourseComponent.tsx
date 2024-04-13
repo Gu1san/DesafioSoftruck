@@ -25,7 +25,7 @@ const CourseComponent: React.FC<ICourseComponent> = ({
           <Text style={styles.vehicleVin}>{vehicleData.vin}</Text>
         </View>
         <View>
-          <Text>{moment(courseData.start_at).format('DD/MM/YY, hh:mm')}</Text>
+          <Text>{moment(courseData.start_at).format('DD/MM/YY, HH:mm')}</Text>
         </View>
       </View>
     </Pressable>

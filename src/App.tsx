@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import {FlatList, SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import gps from './assets/data/frontend_data_gps.json';
 import CourseComponent from './components/CourseComponent';
+import DraggableViewComponent from './components/DraggableViewComponent';
 
 function App(): React.JSX.Element {
   const gpsData = gps.courses[0].gps;
@@ -36,6 +37,16 @@ function App(): React.JSX.Element {
     setMarkerSprite(sprites[nearestAngle.toString()]);
   }, [currentLocation]);
 
+  const listRenderer = ({item, index}: any) => {
+    return (
+      <CourseComponent
+        key={`course-${index}`}
+        courseData={item}
+        vehicleData={gps.vehicle}
+      />
+    );
+  };
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <MapView
@@ -68,9 +79,10 @@ function App(): React.JSX.Element {
       </MapView>
       <View style={styles.bottom}>
         <Text style={styles.title}>Rotas</Text>
-        <CourseComponent
-          courseData={gps.courses[0]}
-          vehicleData={gps.vehicle}
+        <FlatList
+          style={styles.flatlist}
+          data={gps.courses}
+          renderItem={listRenderer}
         />
       </View>
     </SafeAreaView>
@@ -84,10 +96,14 @@ const styles = StyleSheet.create({
   bottom: {
     backgroundColor: '#fafafa',
     padding: 10,
+    flex: 1,
   },
   title: {
     fontSize: 22,
     color: '#000',
+  },
+  flatlist: {
+    flex: 1,
   },
 });
 
