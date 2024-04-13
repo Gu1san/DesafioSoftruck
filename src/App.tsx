@@ -1,14 +1,39 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {SafeAreaView, StyleSheet} from 'react-native';
-import MapView, {Marker, Polyline} from 'react-native-maps';
+import MapView, {LatLng, Marker, Polyline} from 'react-native-maps';
 import gps from './assets/data/frontend_data_gps.json';
 
 function App(): React.JSX.Element {
   const gpsData = gps.courses[0].gps;
-  const filteredData = gpsData.map(({latitude, longitude}) => ({
-    latitude,
-    longitude,
-  }));
+  const sprites: any = {
+    '0': require('./assets/img/car3.png'),
+    '45': require('./assets/img/car4.png'),
+    '90': require('./assets/img/car5.png'),
+    '135': require('./assets/img/car6.png'),
+    '180': require('./assets/img/car7.png'),
+    '225': require('./assets/img/car8.png'),
+    '270': require('./assets/img/car1.png'),
+    '315': require('./assets/img/car2.png'),
+    '360': require('./assets/img/car3.png'),
+  };
+  const [currentLocation, setCurrentLocation] = useState<number>(0);
+  const [markerSprite, setMarkerSprite] = useState(sprites['0']);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentLocation(prevLocation =>
+        prevLocation < gpsData.length - 1 ? prevLocation + 1 : 0,
+      );
+    }, 1000 * 1);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const direction = gpsData[currentLocation].direction;
+    const nearestAngle = Math.round(direction / 45) * 45;
+    setMarkerSprite(sprites[nearestAngle.toString()]);
+  }, [currentLocation]);
 
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -16,17 +41,17 @@ function App(): React.JSX.Element {
         provider="google"
         style={styles.map}
         region={{
-          latitude: filteredData[0].latitude,
-          longitude: filteredData[0].longitude,
+          latitude: gpsData[0].latitude,
+          longitude: gpsData[0].longitude,
           latitudeDelta: 0.015,
           longitudeDelta: 0.0121,
         }}>
         <Polyline
-          coordinates={filteredData}
-          strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
+          coordinates={gpsData}
+          strokeColor="#000"
           strokeColors={[
             '#7F0000',
-            '#00000000', // no color, creates a "long" gradient between the previous and next coordinate
+            '#00000000',
             '#B24112',
             '#E5845C',
             '#238C23',
@@ -36,8 +61,8 @@ function App(): React.JSX.Element {
         />
         <Marker
           anchor={{x: 0.5, y: 0.5}}
-          coordinate={filteredData[0]}
-          image={require('./assets/img/car1.png')}
+          coordinate={gpsData[currentLocation]}
+          image={markerSprite}
         />
       </MapView>
     </SafeAreaView>
