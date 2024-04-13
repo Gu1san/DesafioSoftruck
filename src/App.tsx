@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, StyleSheet} from 'react-native';
-import MapView, {LatLng, Marker, Polyline} from 'react-native-maps';
+import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import MapView, {Marker, Polyline} from 'react-native-maps';
 import gps from './assets/data/frontend_data_gps.json';
+import CourseComponent from './components/CourseComponent';
 
 function App(): React.JSX.Element {
   const gpsData = gps.courses[0].gps;
@@ -65,13 +66,28 @@ function App(): React.JSX.Element {
           image={markerSprite}
         />
       </MapView>
+      <View style={styles.bottom}>
+        <Text style={styles.title}>Rotas</Text>
+        <CourseComponent
+          courseData={gps.courses[0]}
+          vehicleData={gps.vehicle}
+        />
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   map: {
-    ...StyleSheet.absoluteFillObject,
+    flex: 1,
+  },
+  bottom: {
+    backgroundColor: '#fafafa',
+    padding: 10,
+  },
+  title: {
+    fontSize: 22,
+    color: '#000',
   },
 });
 
