@@ -19,7 +19,13 @@ const CourseComponent: React.FC<ICourseComponent> = ({
       onPress={() => {
         RouteProvider.setCourse(courseData);
       }}>
-      <View style={styles.vehicleInfoCnt}>
+      <View
+        style={[
+          styles.vehicleInfoCnt,
+          RouteProvider.currentCourse?.start_at === courseData.start_at
+            ? {borderWidth: 1}
+            : {},
+        ]}>
         <Image
           style={styles.vehicleImage}
           source={{uri: vehicleData.picture.address}}
@@ -45,6 +51,9 @@ const styles = StyleSheet.create({
   vehicleInfoCnt: {
     flexDirection: 'row',
     alignItems: 'center',
+    borderRadius: 20,
+    borderColor: '#000',
+    paddingHorizontal: 5,
   },
   vehicleTxtsCnt: {
     justifyContent: 'center',
