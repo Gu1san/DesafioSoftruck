@@ -1,9 +1,15 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {StyleSheet} from 'react-native';
-import MapView, {Marker, Polyline} from 'react-native-maps';
+import MapView, {
+  AnimatedRegion,
+  MarkerAnimated,
+  Polyline,
+} from 'react-native-maps';
 import {RouteContext} from '../contexts/route';
 
 const MapComponent: React.FC = () => {
+  const RouteProvider = useContext(RouteContext);
+  const gpsData = RouteProvider.currentCourse.gps;
   const sprites: any = {
     '0': require('../assets/img/car3.png'),
     '45': require('../assets/img/car4.png'),
@@ -17,28 +23,55 @@ const MapComponent: React.FC = () => {
   };
   const [currentLocation, setCurrentLocation] = useState<number>(0);
   const [markerSprite, setMarkerSprite] = useState(sprites['0']);
-  const RouteProvider = useContext(RouteContext);
-
-  const gpsData = RouteProvider.currentCourse.gps;
+  const [coordinate, setCoordinate] = useState(
+    new AnimatedRegion({
+      latitude: gpsData[currentLocation].latitude,
+      longitude: gpsData[currentLocation].longitude,
+    }),
+  );
 
   useEffect(() => {
+    setCurrentLocation(0);
+    setCoordinate(
+      new AnimatedRegion({
+        latitude: gpsData[currentLocation].latitude,
+        longitude: gpsData[currentLocation].longitude,
+      }),
+    );
+
     const interval = setInterval(() => {
       setCurrentLocation(prevLocation =>
         prevLocation < gpsData.length - 1 ? prevLocation + 1 : 0,
       );
     }, 1000 * 1);
-    return () => {
-      console.log('clear interval');
-      setCurrentLocation(0);
-      clearInterval(interval);
-    };
+
+    return () => clearInterval(interval);
   }, [RouteProvider.currentCourse]);
 
   useEffect(() => {
+    animateMarker();
+    updateMarkerSprite();
+  }, [currentLocation]);
+
+  const animateMarker = () => {
+    const {latitude, longitude} = gpsData[currentLocation];
+    coordinate
+      .timing({
+        latitude,
+        longitude,
+        toValue: 0,
+        useNativeDriver: false,
+        latitudeDelta: 0,
+        longitudeDelta: 0,
+      })
+      .start();
+  };
+
+  const updateMarkerSprite = () => {
     const direction = gpsData[currentLocation].direction;
     const nearestAngle = Math.round(direction / 45) * 45;
     setMarkerSprite(sprites[nearestAngle.toString()]);
-  }, [currentLocation]);
+  };
 
   return (
     <MapView
@@ -51,9 +84,10 @@ const MapComponent: React.FC = () => {
         longitudeDelta: 0.0121,
       }}>
       <Polyline coordinates={gpsData} strokeColor="#000" strokeWidth={3} />
-      <Marker
+      <MarkerAnimated
+        style={styles.marker}
         anchor={{x: 0.5, y: 0.5}}
-        coordinate={gpsData[currentLocation]}
+        coordinate={coordinate}
         image={markerSprite}
       />
     </MapView>
@@ -64,6 +98,13 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
+  layerBurron: {
+    position: 'absolute',
+    top: 30,
+    right: 30,
+    borderRadius: 50,
+  },
+  marker: {height: 60, width: 60},
 });
 
 export default MapComponent;
