@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import {ICourseData, IVehicleData} from '../Interfaces';
 import moment from 'moment';
+import {RouteContext} from '../contexts/route';
 
 interface ICourseComponent {
   courseData: ICourseData;
@@ -12,8 +13,12 @@ const CourseComponent: React.FC<ICourseComponent> = ({
   courseData,
   vehicleData,
 }) => {
+  const RouteProvider = useContext(RouteContext);
   return (
-    <Pressable>
+    <Pressable
+      onPress={() => {
+        RouteProvider.setCourse(courseData);
+      }}>
       <View style={styles.vehicleInfoCnt}>
         <Image
           style={styles.vehicleImage}
