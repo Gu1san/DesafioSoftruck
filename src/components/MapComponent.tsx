@@ -23,21 +23,15 @@ const MapComponent: React.FC = () => {
   };
   const [currentLocation, setCurrentLocation] = useState<number>(0);
   const [markerSprite, setMarkerSprite] = useState(sprites['0']);
-  const [coordinate, setCoordinate] = useState(
+  const [coordinate] = useState(
     new AnimatedRegion({
-      latitude: gpsData[currentLocation].latitude,
-      longitude: gpsData[currentLocation].longitude,
+      latitude: gpsData[0].latitude,
+      longitude: gpsData[0].longitude,
     }),
   );
 
   useEffect(() => {
     setCurrentLocation(0);
-    setCoordinate(
-      new AnimatedRegion({
-        latitude: gpsData[currentLocation].latitude,
-        longitude: gpsData[currentLocation].longitude,
-      }),
-    );
 
     const interval = setInterval(() => {
       setCurrentLocation(prevLocation =>
