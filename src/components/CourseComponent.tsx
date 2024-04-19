@@ -35,8 +35,9 @@ const CourseComponent: React.FC<ICourseComponent> = ({
           <Text style={styles.vehiclePlate}>{vehicleData.plate}</Text>
           <Text style={styles.vehicleVin}>{vehicleData.vin}</Text>
         </View>
-        <View>
-          <Text>{moment(courseData.start_at).format('DD/MM/YY, HH:mm')}</Text>
+        <View style={{alignItems: 'center'}}>
+          <Text>{moment(courseData.start_at).format('L')},</Text>
+          <Text>{moment(courseData.start_at).format('LT')}</Text>
         </View>
       </View>
     </Pressable>
